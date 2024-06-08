@@ -27,21 +27,34 @@ def lambda_handler(event, context):
     '''
     #print("Received event: " + json.dumps(event, indent=2))
     
-    map_response_to_json()
+    return map_response_to_json()
 
-    operations = {
+    """operations = {
         'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
         'GET': lambda dynamo, x: dynamo.scan(**x),
         'POST': lambda dynamo, x: dynamo.put_item(**x),
         'PUT': lambda dynamo, x: dynamo.update_item(**x),
     }
+    
+    print("Received event: " + json.dumps(event, indent=2))
 
-    operation = event['httpMethod']
+    try:
+        operation = event['httpMethod']
+    except KeyError:
+        return respond(ValueError('Missing httpMethod in the event'))
+
     if operation in operations:
-        payload = event['queryStringParameters'] if operation == 'GET' else json.loads(event['body'])
-        return respond(None, operations[operation](dynamo, payload))
+        try:
+            if operation == 'GET':
+                payload = event['queryStringParameters']
+            else:
+                payload = json.loads(event['body'])
+            result = operations[operation](dynamo, payload)
+            return respond(None, result)
+        except Exception as e:
+            return respond(e)
     else:
-        return respond(ValueError('Unsupported method "{}"'.format(operation)))
+        return respond(ValueError('Unsupported method "{}"'.format(operation)))"""
 
 def map_response_to_json():
     baseUrl = "https://beetle-curious-longhorn.ngrok-free.app"
