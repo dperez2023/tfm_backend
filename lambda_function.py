@@ -27,7 +27,11 @@ def lambda_handler(event, context):
     '''
     #print("Received event: " + json.dumps(event, indent=2))
     
-    return map_response_to_json()
+    hourly = map_response_to_json('hourly')
+    daily = map_response_to_json('daily')
+    monthly = map_response_to_json('monthly')
+    
+    return hourly + daily + monthly
 
     """operations = {
         'DELETE': lambda dynamo, x: dynamo.delete_item(**x),
@@ -56,12 +60,13 @@ def lambda_handler(event, context):
     else:
         return respond(ValueError('Unsupported method "{}"'.format(operation)))"""
 
-def map_response_to_json():
+def map_response_to_json(frequency: str):
     baseUrl = "https://beetle-curious-longhorn.ngrok-free.app"
     endpoint = "/energyUsage/"
     user = "user/mfkzen@gmail.com"
-    frequency = "/frequency/hourly"
-    url = baseUrl+endpoint+user+frequency
+    frequencyUrl = f'/frequency/{frequency}'
+
+    url = baseUrl+endpoint+user+frequencyUrl
     response = requests.get(url)
 
     # Check if the request was successful
